@@ -176,7 +176,7 @@
         const relativeDeg = (360 - (finalDeg - pointerDeg) + 360) % 360;
         const index = Math.floor(relativeDeg / (360 / segmentCount));
 
-        document.getElementById("result").innerText = `Result: ${chosenTopics[index]}`;
+        document.getElementById("result").innerText = `Your theme: ${chosenTopics[index]}`;
       }
     }
 
