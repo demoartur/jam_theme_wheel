@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LDJam pick-a-theme wheel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #1a1a1a;
+      color: white;
+    }
+    #wheelContainer {
+      position: relative;
+    }
+    #wheelCanvas {
+      border: 5px solid #333;
+      border-radius: 50%;
+    }
+    #peg {
+      width: 0; 
+      height: 0; 
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 45px solid #ef027d;
+      position: absolute;
+      top: 5px;
+      left: 295px;
+      transform: rotate(0.5turn);
+      z-index: 10;
+    }
+    button {
+      background: #444444;
+      border-radius: 8px;
+      display: inline-block;
+      cursor: pointer;
+      color:  #ffffff;
+      font-family: Arial;
+      font-size:1.3em;
+      font-weight:bold;
+      padding:8px 32px;
+      margin: 10px;
+      text-decoration:none;
+    }
+
+    .btn_shuffle {
+      background: #4B70F5 !important;
+    }
+
+    .btn_spin {
+      background: #ef027d !important;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 3em;
+      font-weight: bold;
+    }
+
+    p {
+      color: #666666;
+    }
+
+    a {
+      color: #4C3BCF;
+    }
+  </style>
+</head>
+<body>
+
+<div id="wheelContainer">
+  <div id="peg"></div>
+  <canvas id="wheelCanvas" width="620" height="620"></canvas>
+</div>
+<div id="result">...</div>
+<div><button class="btn_shuffle" onclick="chooseTopics()">Shuffle themes</button>
+<button class="btn_spin" onclick="spinWheel()">SPIN!</button></div>
+<br>
+<div><p>LDJam pick-a-theme wheel. Themes list grabbed from <a href="https://docs.google.com/spreadsheets/d/1oSkhD9Mk1FS8bkKsNdf0BtHAR4PI7OZ1ArMSBNpP5uo/edit?gid=0#gid=0" target="_blank">here</a> and <a href="https://www.reddit.com/r/ludumdare/comments/187ntch/im_making_a_list_of_all_the_themes_from_the_final/"  target="_blank">here</a>.</p></div>
+
+<script>
+  const topics = [
+    "Shelter", "Break the cycle", "Underground", "Strange machines", "Paths", "Signal", "Folklore", "Overgrown", "Sanctuary", "Salvage", "Reflect", "Locks and keys", "Keep the light on", "Tiny Creatures", "Limited space", "Absorb", "Delivery", "Cartography", "Leave something behind", "Parasite", "The wrong tool for the job", "Ascend", "Your health bar is more than just a health bar", "Limited visibility", "It spreads", "Clear a path", "Every input does two things", "Start small", "Harvest", "Layers", "Companion", "Connections", "Keep it contained", "Summoning", "Expand", "Combine", "The other side", "Side effects", "Extraction", "Pathways", "Every 10 seconds", "Use it or lose it", "Split", "Mutations", "Corruption", "Keep it moving", "Side effect", "Nothing is permanent", "Duplication", "Making connections", "You shouldn't mix those", "Delay the inevitable", "Fragile", "Make connections", "Mutation", "Teleportation", "A single resource", "Infestation", "Road trip", "Tunnels", "Out of order", "Space is limited", "Garden", "Unstable", "One tool, many uses", "Decay", "On / Off", "Keep your distance", "The environment changes you", "Everything changes at night", "3 rules", "Replication", "Strength in numbers", "It follows you", "Deeper and deeper", "Expansion", "Hidden world", "You are the power source", "Generations", "Automation", "Lost signal", "One time use", "Containment", "Split in two", "Control the world, not the player", "Nomad", "Stuck in a loop", "Feeding the monster", "Contain it", "Day and night", "Shipwrecked", "Clockwork", "You can't save them all", "Death is not the end", "The world changes when you are not looking", "Dreams", "Turn a violent genre non-violent", "An abandoned world", "1 minute to prepare", "Outdated technology", "Ruins", "Momentum", "Keep it alive", "Start with nothing", "Unconventional travel", "Small character, big enemies", "Factory", "One item, many uses", "Night is coming", "Isolation", "Low Tech", "Take one, leave the rest", "Evolve to survive", "Limited memory", "Ridiculously overpowered", "Your life is currency", "Space exploration", "Change the genre of a classic video game", "Only one enemy", "Risky powerups", "Color changes everything", "Everything has a price", "Contagious", "Tiny town", "No upgrades, only downgrades", "Each playthrough builds on the last", "Everything grows", "It only changes when you aren't looking", "Sacrifices must be made", "Absorb your enemies", "Darkness is your friend", "Don't trust the game", "Magic, but at what cost?", "Take one, leave one", "Two connected worlds", "Evolve", "Running out of space", "Safe in the dark", "You are the final boss", "Light is key", "Death is useful", "Two points of view", "Dying planet", "It's spreading", "One enemy only", "One minute", "You control the environment, not player", "You are the weapon", "A light in the dark", "Keep growing", "Unusual magic", "At the beginning there is nothing", "Combine 2 incompatible genres (e.g. turn based racing)", "You really shouldn't mix those", "Floating islands", "You are what you eat", "Self-replication", "The more you have, the worse it is", "You are not the main character", "Tiny machines", "Only three colors", "Broken world", "You control the scenario, not the character", "One level, but constantly changing", "Into the unknown", "Everything is connected", "Signal lost", "Parallel worlds", "Moving fortress", "Running out of power", "You are alone", "Machines", "Protect it", "1 vs 100", "Different perspective", "1 HP", "Dark / Light", "You control the game, not the player", "Parallel Dimensions", "Pausing has Consequences", "Two Colors", "Island", "A World in the Skies", "Inconvenient Superpowers", "Death is only the Beginning", "A Small World", "One room", "Only 5 minutes", "Control the environment not the characters", "Wait, are we the bad guys?", "Salvage and repair", "Save yourself, not the world", "Upgrade yourself", "Chain reaction", "Small world", "Simplicity", "Ancient Technology", "A Different Kind of Combat", "Going Deeper", "Alchemy", "Upgrade", "Beyond the Wall", "Controlling Many", "Power Source", "Don’t Kill Anything", "Level Changes While You’re Playing", "Plan Then Execute", "Magic Gone Wrong", "Hunted", "Shapeshift", "Death is Progress", "Microworld", "The light hurts you", "Indirect Control", "You don't control the hero", "One Massive Enemy", "Create Life", "You Are The Dungeon", "One Item, choose", "Limited Resources", "Limited View", "Build Your Way", "Everything Falls Apart", "Growing/two button controls", "Alone in the World", "A Map Will Be Useful", "Attraction", "Build Your Way Out", "Can’t Stop Moving", "Destroying Yourself", "Expanding World", "Growing Things", "Limited Capacity", "No Enemies", "One Rule", "Power Supply", "You are the Monster", "An Unconventional Weapon", "Among the Stars", "Edge of the World", "Discovery", "Four Elements", "Self-Destruction", "Hunted/Hunter", "Creatures of the Night", "Entire Game on One Screen", "Artificial Life", "Snowman (???)", "After the End", "Generation", "Avoid the Light", "Deep Space", "You Are Not Supposed To Be Here", "End Where You Started", "You Can’t Stop", "Playing Both Sides", "Borders", "Chaos", "Deja vu", "Connected Worlds", "Another World", "Don't Stop Moving", "Growing", "Choose A Path", "Lost In Space", "Destroy The System", "Fortress", "You Must Leave It Behind", "Break The Rules", "No One Can See You", "Do No Harm", "Randomly Generated", "You Are Already Dead", "Beneath the Surface", "You Are Your Own Enemy", "We Must Go Deeper", "Control More Than One", "Two Worlds", "It Never Ends", "It's NOT supposed to do THAT!", "Everything Breaks", "You Are The World", "Time Does Not Exist", "Glitch", "Contrast", "You Only Get One", "Break The System", "Creation", "No Violence", "End of The Universe", "Falling", "Contamination", "Clones", "Genetics", "Duel", "Illusion", "10 Seconds", "Strange Power-ups", "Multi-layered world", "Survival", "Lifecycle", "Evil vs Evil", "Alternative Reality", "Darkness", "Surveillance", "Minimalism", "Death is Good", "Exploration", "No Weapons Allowed", "Every Death Is Meaningful", "After the End of the World", "Islands", "You Are Your Enemy", "Afterlife", "Colony", "Against the Rules", "Creation and Destruction", "Dig Deeper", "Ancient Ruins", "Alternative Physics", "You Are The Villain", "Journey", "Time Loop", "Outer Space", "Construction", "Evolution", "Survive", "Deep Space", "Chain Reaction", "Don't Go Outside", "Beginning of Time", "Curiosity", "Castles", "Night", "Trapped in Another World", "1000 Kittens", "Tiny World", "Death Is A New Beginning", "Kittens", "Build It, Then Use It", "Castles In The Sky", "Growth", "Discovery", "Parallel Universes", "Alternate Reality", "Explore The Universe", "Alone", "Parallel dimension", "Forgotten places", "Moon", "Consequences", "Territory", "Mechanisms", "Antihero", "Reflection", "Shape-shifting", "Escape", "Adaptation", "Immortality", "Very large Vs Very Small", "Apocalypse", "Architecture", "Thieves", "Stealth", "Wormholes", "Resurrection", "Espionage", "It's dangerous to go alone! Take this!", "Oh god... WHAT HAVE I DONE!?!", "Traps", "Non-Euclidean Space (Portals, Escher stairs, Impossible Rooms)", "Big and Small", "Sense of Scale", "Broken Physics", "Lies", "Perception / Reality", "The floor is made of lava! AAHHHH!!", "Colossal", "Climbing", "Aging", "Anachronism", "Girl Games", "Being lost", "Depth", "Digging", "Sacrifice", "Aftermath", "Seeds", "The Unknown", "Energy", "Demolition", "Created but never destroyed", "Elements", "That was unexpected", "Vulnerability", "Text Input Action Game", "Game based on a year", "Don't die", "Enemies as Weapons", "Dreams, Hallucinations or Mental Illness", "Technology in the wrong time period", "Rain", "Non-standard Game Over", "Hidden Depths", "Skyscrapers", "Claustrophobia", "Panic", "Cooperation", "Bugs", "Flight", "Cheating Death", "Double ZOMBIE Rainbow", "Outnumbered", "Flood", "Collecting", "Ecosystem", "Continuous Motion", "Forest", "Annihilation", "Pretentious Art Game", "Unwanted Powers", "Time", "Unwinnable War", "All Humans are dead", "Holes", "Invulnerability isnt all it cracked up to be", "Betrayal as a gameplay mechanic", "alter the laws of Physics", "Twilight fandom", "Caverns", "Burrowing", "Castle", "Clouds", "Winds", "Cold and Frozen", "Town", "Herding", "Flow", "Glow in the dark", "Flashlight", "Role Reversal", "Zombies", "Recycling", "Advancing Wall of Doom", "Single Enemy", "Evil, defeat the lone hero!", "Very Short Games", "Procedural Generation", "Microscopic World", "Epidemic", "Bosses", "Distorted perception", "Explosions", "Recursion (specifically, Yo Dawg!)", "Roads", "Bridge", "Train", "Climb", "Tiny", "Air", "Orbit", "Circuits", "Balloon!", "Shatter", "The Tower", "Procedural", "Bleeding / Leaking", "Avalanche", "Shadows", "Everything's breakable", "Chemical reaction", "Minimalist", "Endless", "Defense", "Anti-Gravity", "Turn Based", "Slowed time", "Bumper cars", "Backwards", "Morph", "Icicles", "Weird/Unexpected/Surprise", "Particles", "electricity", "crazy physics", "ZERO GRAVITY!!!", "Rhythm", "highscore", "programming", "Procrastination", "Quantum", "Colonization", "Aquarium", "AI Opponent", "Reverse time", "Build the level you play", "Moon/anti-text", "Swarms", "Random", "Infection", "Preparation – Set it up, let it go", "Construction/destruction (sheep)", "Guardian", "Indirect interaction" 
+  ];
+
+  const segmentCount = 16;
+  let chosenTopics = [];
+  let anglePerSegment;
+  let spinning = false;
+  const canvas = document.getElementById("wheelCanvas");
+  const ctx = canvas.getContext("2d");
+  const center = canvas.width / 2;
+  let finalAngle = 0;
+
+  function chooseTopics() {
+    const shuffled = topics.sort(() => 0.5 - Math.random());
+    chosenTopics = shuffled.slice(0, segmentCount);
+    drawWheel(0);
+    document.getElementById("result").innerText = "...";
+  }
+
+  function drawWheel(rotation) {
+    const colors = ["#402E7A", "#4C3BCF", "#4B70F5", "#3DC2EC"];
+    anglePerSegment = (2 * Math.PI) / segmentCount;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(rotation);
+
+    for (let i = 0; i < segmentCount; i++) {
+      const startAngle = i * anglePerSegment;
+      const endAngle = startAngle + anglePerSegment;
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, center - 10, startAngle, endAngle);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.save();
+      ctx.rotate(startAngle + anglePerSegment / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "white";
+      ctx.font = "14px sans-serif";
+      ctx.fillText(chosenTopics[i] || "", center - 20, 10);
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.rotate((270 * Math.PI / 180));
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -center + 20);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function spinWheel() {
+    if (spinning || chosenTopics.length < segmentCount) return alert("Pick themes first!");
+
+    const duration = 6000;
+    let start = null;
+    const totalRotation = Math.random() * 360 + 720;
+    const targetRotation = totalRotation * Math.PI / 180;
+
+    spinning = true;
+
+    function rotate(timestamp) {
+      if (!start) start = timestamp;
+      const progress = timestamp - start;
+      const eased = easeOut(progress / duration);
+      const angle = eased * targetRotation;
+
+      drawWheel(angle);
+      finalAngle = angle;
+
+      if (progress < duration) {
+        requestAnimationFrame(rotate);
+      } else {
+        spinning = false;
+
+        const finalDeg = (finalAngle * 180 / Math.PI) % 360;
+        const pointerDeg = 270;
+        const relativeDeg = (360 - (finalDeg - pointerDeg) + 360) % 360;
+        const index = Math.floor(relativeDeg / (360 / segmentCount));
+
+        document.getElementById("result").innerText = `Result: ${chosenTopics[index]}`;
+      }
+    }
+
+    requestAnimationFrame(rotate);
+  }
+
+  function easeOut(t) {
+    return --t * t * t + 1;
+  }
+  chooseTopics()
+</script>
+</body>
+</html>
